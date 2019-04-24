@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher; 
 import java.util.regex.Pattern;
-//calculates the cosine similarity between two texts / documents etc., (having each word separated by space)
+//calculates the similarity between two texts / documents etc., (having each word separated by space)
 public class Similarity
 {
      public class values
@@ -25,7 +25,7 @@ public class Similarity
       }
  }//end of class values
 
- public double Cosine_Similarity_Score(String Text1, String Text2)
+ public double Similarity_Score(String Text1, String Text2)
  {
     double sim_score=0.0000000;
     //1. Identify distinct words from both documents
@@ -80,7 +80,7 @@ public class Similarity
      }
     }
      
-    //calculate the cosine similarity score.
+    //calculate the  similarity score.
     double VectAB = 0.0000000;
     double VectA_Sq = 0.0000000;
     double VectB_Sq = 0.0000000;
@@ -91,14 +91,14 @@ public class Similarity
      
      double freq1 = (double)vals12.val1;
      double freq2 = (double)vals12.val2;
-     System.out.println(Distinct_words_text_1_2.get(i)+"#"+freq1+"#"+freq2);
+    // System.out.println(Distinct_words_text_1_2.get(i)+"#"+freq1+"#"+freq2);
       
      VectAB=VectAB+(freq1*freq2);
       
      VectA_Sq = VectA_Sq + freq1*freq1;
      VectB_Sq = VectB_Sq + freq2*freq2;
     }
-    System.out.println("VectAB "+VectAB+" VectA_Sq "+VectA_Sq+" VectB_Sq "+VectB_Sq);
+   // System.out.println("VectAB "+VectAB+" VectA_Sq "+VectA_Sq+" VectB_Sq "+VectB_Sq);
     sim_score = ((VectAB)/(Math.sqrt(VectA_Sq)*Math.sqrt(VectB_Sq)));
     
 
@@ -124,7 +124,7 @@ public class Similarity
 
         while (m.find()) 
         {
-            System.out.println("Pattern found from " + m.start() + " to " + (m.end()-1));
+          //  System.out.println("Pattern found from " + m.start() + " to " + (m.end()-1));
             dist_match = m.end()-m.start()+1;
             if(c==0)
             {
