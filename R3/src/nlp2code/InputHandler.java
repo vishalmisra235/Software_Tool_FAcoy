@@ -41,13 +41,16 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 
@@ -61,90 +64,96 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+class BrowserDialog extends Dialog {
 
- class MyTitleAreaDialog extends TitleAreaDialog {
+    private String browserString;
 
-    private Text txtFirstName;
-    private Text lastNameText;
-
-    private String firstName;
-    private String lastName;
-
-    public MyTitleAreaDialog(Shell parentShell) {
+    protected BrowserDialog(Shell parentShell, String browserString) {
         super(parentShell);
-    }
-
-    @Override
-    public void create() {
-        super.create();
-        setTitle("This is my first custom dialog");
-        setMessage("This is a TitleAreaDialog", IMessageProvider.INFORMATION);
+        this.browserString = browserString;
     }
 
     @Override
     protected Control createDialogArea(Composite parent) {
-        Composite area = (Composite) super.createDialogArea(parent);
-        Composite container = new Composite(area, SWT.NONE);
-        container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        GridLayout layout = new GridLayout(2, false);
-        container.setLayout(layout);
+        Composite composite = (Composite) super.createDialogArea(parent);
 
-        createFirstName(container);
-        createLastName(container);
+        GridLayout layout = new GridLayout(1, false);
+        composite.setLayout(layout);
 
-        return area;
-    }
-
-    private void createFirstName(Composite container) {
-        Label lbtFirstName = new Label(container, SWT.NONE);
-        lbtFirstName.setText("First Name");
-
-        GridData dataFirstName = new GridData();
-        dataFirstName.grabExcessHorizontalSpace = true;
-        dataFirstName.horizontalAlignment = GridData.FILL;
-
-        txtFirstName = new Text(container, SWT.BORDER);
-        txtFirstName.setLayoutData(dataFirstName);
-    }
-
-    private void createLastName(Composite container) {
-        Label lbtLastName = new Label(container, SWT.NONE);
-        lbtLastName.setText("Last Name");
-
-        GridData dataLastName = new GridData();
-        dataLastName.grabExcessHorizontalSpace = true;
-        dataLastName.horizontalAlignment = GridData.FILL;
-        lastNameText = new Text(container, SWT.BORDER);
-        lastNameText.setLayoutData(dataLastName);
-    }
+        GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+        data.widthHint = 600;
+        data.heightHint = 600;
+        composite.setLayoutData(data);
 
 
+        Browser browser = new Browser(composite, SWT.NONE);
+        browser.setText(browserString);
+        browser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-    @Override
-    protected boolean isResizable() {
-        return true;
-    }
-
-    // save content of the Text fields because they get disposed
-    // as soon as the Dialog closes
-    private void saveInput() {
-        firstName = txtFirstName.getText();
-        lastName = lastNameText.getText();
-
+        return composite;
     }
 
     @Override
-    protected void okPressed() {
-        saveInput();
-        super.okPressed();
+    protected void createButtonsForButtonBar(Composite parent) {
+        createButton(parent, Dialog.OK, "OK", true);
+        createButton(parent, Dialog.CANCEL, "Cancel", false);
+    }
+    @Override
+    protected void configureShell(Shell newShell) {
+        super.configureShell(newShell);
+        newShell.setText("Your Selected Code");
     }
 
-    public String getFirstName() {
-        return firstName;
+    @Override
+    public void okPressed() {
+        close();
+    }
+}
+class BrowserDialog1 extends Dialog {
+
+    private String browserString;
+
+    protected BrowserDialog1(Shell parentShell, String browserString) {
+        super(parentShell);
+        this.browserString = browserString;
     }
 
-    public String getLastName() {
-        return lastName;
+    @Override
+    protected Control createDialogArea(Composite parent) {
+        Composite composite = (Composite) super.createDialogArea(parent);
+
+        GridLayout layout = new GridLayout(1, false);
+        composite.setLayout(layout);
+
+        GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+        data.widthHint = 600;
+        data.heightHint = 600;
+        composite.setLayoutData(data);
+
+
+        Browser browser = new Browser(composite, SWT.NONE);
+        browser.setText(browserString);
+        browser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        return composite;
+    }
+
+    @Override
+    protected void createButtonsForButtonBar(Composite parent) {
+        createButton(parent, 0, "Next Code", true);
+        createButton(parent, 1, "Copy Code", false);
+        createButton(parent, 2, "Close", false);
+       
+    }
+    @Override
+    protected void configureShell(Shell newShell) {
+        super.configureShell(newShell);
+        newShell.setText("Retrieved Code");
+    }
+
+    @Override
+    public void okPressed() {
+        close();
     }
 }
 /**
@@ -185,16 +194,28 @@ public class InputHandler extends AbstractHandler {
 				        ISelection sel = editor.getSelectionProvider().getSelection();
 				        IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 				        int offset = doc.getLineOffset(doc.getNumberOfLines()-1);
-				        
+				        int y=0;
 				        if ( sel instanceof TextSelection ) {
 				            final TextSelection textSel = (TextSelection)sel;
 				            String txt=textSel.getText();
 				            List<String> list = new ArrayList<String>(Arrays.asList(txt.split("\n")));
 				            for(String str : list)
 				            {
-				                System.out.println(str);
+				               // System.out.println(str);
 				            }
-				           MessageDialog.openInformation(window.getShell(),"Selected text","Your selected text is\n\n" + txt);
+				          //  MyTitleAreaDialog x=new MyTitleAreaDialog(window.getShell());
+				           // x.create();
+				            String text="<h3>Your selected text is:</h3>\n\n"+txt;
+//				            final Display display = new Display();
+//				            Shell shell = new Shell(display);
+
+				           // Color gray = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+
+				         //   String hex = String.format("#%02x%02x%02x", gray.getRed(), gray.getGreen(), gray.getBlue());
+
+				            y=new BrowserDialog(window.getShell(), "<body>"+text+"</body>").open();
+				            System.out.println(y);
+				            //MessageDialog.openInformation(window.getShell(),"Selected text",text);
 				          //  ElementListSelectionDialog listDialog = new ElementListSelectionDialog(window.getShell(),new LabelProvider());	    
 				    	   // listDialog.setTitle("This is Element List Title");
 				    	   // listDialog.setMessage("This is Element List Message");
@@ -205,17 +226,19 @@ public class InputHandler extends AbstractHandler {
 				           // }
 				    	   // listDialog.setElements(list.toArray());
 				    	   // listDialog.open();
-				            scrap(txt);
+				            if(y==0) {
+				            	scrap(txt);
+				            }
 				            original_text = txt;
 				            
 				            System.out.println("hi");
 				        }
-				        
+				        if(y==0) {
 				        Similarity s = new Similarity();
 				        
 				        for(String x:results)
 				        {
-				        	double score = s.Cosine_Similarity_Score(x, original_text);
+				        	double score = s.Similarity_Score(x, original_text);
 				        	new_results.add(score);
 				        	mp.put(x, score);
 				        }
@@ -243,14 +266,15 @@ public class InputHandler extends AbstractHandler {
 				        	String key = e.getKey();
 				        	Double value = e.getValue();
 				        	//List<String> list2 = new ArrayList<String>(Arrays.asList(key.split("\n")));
-				        	MessageDialog dialog = new MessageDialog(window.getShell(),"Codes",null,"Similarity Score: "+Double.toString(value)+"\n"+key,MessageDialog.INFORMATION, new String[] {"Next Code","Close","Copy"},0);
+				        	 int a=new BrowserDialog1(window.getShell(), "<body>"+"<h3>Similarity Score: "+Double.toString(value)+"</h3>\n"+key+"</body>").open();
+				        	//MessageDialog dialog = new MessageDialog(window.getShell(),"Codes",null,"Similarity Score: "+Double.toString(value)+"\n"+key,MessageDialog.INFORMATION, new String[] {"Next Code","Close","Copy"},0);
 				        	// ElementListSelectionDialog listDialog1 = new ElementListSelectionDialog(window.getShell(),new LabelProvider());	    
 					    	  //  listDialog1.setTitle("This is Element List Title");
 					    	  //  listDialog1.setMessage(Double.toString(value));
 					    	   // listDialog.setEmptyListMessage(txt);
 					    	  //  listDialog1.setElements(list2.toArray());
 					    	   // listDialog1.open();
-				        int a =dialog.open();
+				       // int a =dialog.open();
 				        	//int a =listDialog1.open();
 				        	//System.out.println(a);
 				        	
@@ -258,7 +282,7 @@ public class InputHandler extends AbstractHandler {
 				        	{
 				        		continue;
 				        	}
-				        	else if(a==2)
+				        	else if(a==1)
 				        	{
 				        		doc.replace(offset, 0, key+"\n");
 				        		break;
@@ -269,7 +293,7 @@ public class InputHandler extends AbstractHandler {
 				        	}
 				        }
 				        
-				    }
+				    }}
 				} 
 				
 				catch( Exception ex ){
